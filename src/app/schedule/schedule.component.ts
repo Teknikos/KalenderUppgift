@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { CalendarOptions } from "@fullcalendar/angular";
+import { CalendarOptions, DateSelectArg, EventClickArg, EventApi } from "@fullcalendar/angular";
 
 import svLocale from "@fullcalendar/core/locales/sv";
 
@@ -11,12 +11,19 @@ import svLocale from "@fullcalendar/core/locales/sv";
 })
 export class ScheduleComponent implements OnInit {
 
+  
   calendarOptions: CalendarOptions = {
     initialView: 'dayGridMonth',
     firstDay: 1,
     locale: svLocale,
+    headerToolbar: {
+      start: 'title',
+      center: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
+      end: 'today prev,next'
+    },
+    selectable: true,
+    selectMirror: true,
     dateClick: this.handleDateClick.bind(this),
-    
     events: function(info, successCallback, failureCallback){
       let eventsArr = 
       [
@@ -26,14 +33,7 @@ export class ScheduleComponent implements OnInit {
       ]
       successCallback(eventsArr);
     },
-
-    headerToolbar: {
-      start: 'title',
-      center: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
-      end: 'today prev,next'
-    },
-    selectable: true,
-    eventClick: function(arg){
+    /*eventClick: function(arg){
       console.log(arg)
       console.log(arg.event.title)
       arg.el.style.borderColor='';
@@ -48,24 +48,54 @@ export class ScheduleComponent implements OnInit {
           start: info.start,
           end: info.end
         };
+        //@ViewChild('calendar').addEvent();
       }
-    }
-    
+      //@ViewChild('calendar').unselect();
+
+    }*/
+    select: this.handleDateSelect.bind(this),
+    eventClick: this.handleEventClick.bind(this),
+    eventsSet: this.handleEvents.bind(this)
   };
 
-  private events: any[];
+  // private events: any[];
 
-  
-  
+  currentevents: EventApi[] = [];
+
+  toggleWeeknumber() {
+    this.calendarOptions.weekNumbers = !this.calendarOptions.weekNumbers
+  }
   
   handleDateClick(arg) {
     alert('date click! ' + arg.dateStr)
     console.log(arg)
-   
   }
   
-  toggleWeeknumber() {
-    this.calendarOptions.weekNumbers = !this.calendarOptions.weekNumbers
+  handleDateSelect(selectInfo: DateSelectArg){
+    const title = prompt('Namnge ditt event');
+    const calendarApi = selectInfo.view.calendar;
+
+    calendarApi.unselect();
+
+    if (title){
+      calendarApi.addEvent({
+        title,
+        start: selectInfo.startStr,
+        end: selectInfo.endStr,
+        allDay: selectInfo.allDay
+      })
+    }
+    // ingen titel = ingen händelse.
+  }
+
+  handleEventClick(clickInfo){
+    if (confirm(`'Vill du ta bort: '${clickInfo.event.title} '?'`)) {
+      clickInfo.event.remove();
+    }
+  }
+
+  handleEvents(events: any[]){
+    this.currentevents = events;
   }
 
   /**
