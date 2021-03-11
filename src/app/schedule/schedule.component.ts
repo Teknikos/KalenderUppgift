@@ -1,7 +1,8 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CalendarOptions, DateSelectArg, EventClickArg, EventApi } from "@fullcalendar/angular";
 
 import svLocale from "@fullcalendar/core/locales/sv";
+import { ModalDismissReasons, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 
 @Component({
@@ -23,7 +24,6 @@ export class ScheduleComponent implements OnInit {
     },
     selectable: true,
     selectMirror: true,
-    dateClick: this.handleDateClick.bind(this),
     events: function(info, successCallback, failureCallback){
       let eventsArr = 
       [
@@ -66,10 +66,10 @@ export class ScheduleComponent implements OnInit {
     this.calendarOptions.weekNumbers = !this.calendarOptions.weekNumbers
   }
   
-  handleDateClick(arg) {
-    alert('date click! ' + arg.dateStr)
-    console.log(arg)
-  }
+ // @ViewChild('content') input: ElementRef;
+
+
+  
   
   handleDateSelect(selectInfo: DateSelectArg){
     const title = prompt('Namnge ditt event');
@@ -88,6 +88,11 @@ export class ScheduleComponent implements OnInit {
     // ingen titel = ingen händelse.
   }
 
+  // handleEventClick(clickInfo){
+  //   if (confirm(`'Vill du ta bort: '${clickInfo.event.title} '?'`)) {
+  //     clickInfo.event.remove();
+  //   }
+  // }
   handleEventClick(clickInfo){
     if (confirm(`'Vill du ta bort: '${clickInfo.event.title} '?'`)) {
       clickInfo.event.remove();
@@ -101,12 +106,43 @@ export class ScheduleComponent implements OnInit {
   /**
    *
    */
-  constructor() {  }
+  constructor(private modalService: NgbModal) {  }
 
   //constructor(private eventService: EventService) {}
 
   ngOnInit() {
     //this.eventService = this.eventService.getEvents();
+  }
+
+
+  /*  MODAL  */ 
+  /*  Open modal. Show a form. Filled in details should be saved as event. 
+      Make it possible to access this when clicking on a date. Or a span of dates.
+  */
+  closeResult = '' ;
+  open(content){
+    this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title'}).result.then((result) => {
+      this.closeResult = `Closed with: ${result}`;
+      console.log(result)
+    }, (reason) => {
+      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+    });
+  }
+
+  private getDismissReason(reason: any): string {
+    if (reason === ModalDismissReasons.ESC) {
+      console.log(`by pressing ESC`)
+      return `by pressing ESC`;
+    }else if (reason === ModalDismissReasons.BACKDROP_CLICK){
+      console.log(`by clicking on a backdrop`)
+      return `by clicking on a backdrop`;
+    }
+    console.log(reason)
+    return `with: ${reason}`;
+  }
+
+  saveEventModal(saveInfo){
+    console.log(`Event to be saved: ${saveInfo}`)
   }
 
 }

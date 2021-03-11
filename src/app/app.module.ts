@@ -13,6 +13,7 @@ import { AppComponent } from './app.component';
 import { MainComponent } from './main/main.component';
 import { NavMenuComponent } from './nav-menu/nav-menu.component';
 import { ScheduleComponent } from './schedule/schedule.component';
+import { ListComponent } from './list/list.component';
 
 FullCalendarModule.registerPlugins([
   dayGridPlugin,
@@ -26,7 +27,8 @@ FullCalendarModule.registerPlugins([
     AppComponent,
     MainComponent,
     NavMenuComponent,
-    ScheduleComponent
+    ScheduleComponent,
+    ListComponent
   ],
   imports: [
     BrowserModule,
